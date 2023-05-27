@@ -26,6 +26,7 @@ public class ItemService {
     public void updateItem(Long id, String name, int price, int stockQuantity)
     {
         Item item = itemRepository.findOne(id);
+        //findItems.change(name,price,stockQuantity); setter를 쓰는대신에  이런씩이라도 써야한다,
         item.setName(name);
         item.setPrice(price);
         item.setStockQuantity(stockQuantity);
