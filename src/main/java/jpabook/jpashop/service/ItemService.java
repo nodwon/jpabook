@@ -1,5 +1,7 @@
 package jpabook.jpashop.service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jpabook.jpashop.domain.item.Item;
 import jpabook.jpashop.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,13 +16,22 @@ import java.util.List;
 public class ItemService {
 
     private final ItemRepository itemRepository;
-
+    private EntityManager em;
     @Transactional
     public void saveItem(Item item){
         itemRepository.save(item);
     }
 
-    // 조회
+    @Transactional
+    public void updateItem(Long id, String name, int price, int stockQuantity)
+    {
+        Item item = itemRepository.findOne(id);
+        item.setName(name);
+        item.setPrice(price);
+        item.setStockQuantity(stockQuantity);
+    }
+
+
     public List<Item> findItems(){
         return itemRepository.findAll();
     }
