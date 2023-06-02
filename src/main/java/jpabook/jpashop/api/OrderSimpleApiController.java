@@ -5,9 +5,13 @@ import jpabook.jpashop.domain.Order;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryDto;
+import jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -25,6 +29,7 @@ Order -> Delivery
 @RequiredArgsConstructor
 public class OrderSimpleApiController {
 
+    private final OrderSimpleQueryRepository orderSimpleQueryRepository;
     private final OrderRepository orderRepository;
 
     /*
@@ -52,17 +57,29 @@ public class OrderSimpleApiController {
                 .collect(toList());
         return result;
     }
-    @GetMapping("/api/v3/simple-orders")
-    public List<SimpleOrderDto> ordersV3() {
-        List<Order> orders = orderRepository.findAllWithMemberDelivery();
-        List<SimpleOrderDto> result = orders.stream()
-                .map(o -> new SimpleOrderDto(o))
+//    @GetMapping("/api/v3/simple-orders")
+//    public List<SimpleOrderDto> ordersV3() {
+//        List<Order> orders = orderRepository.findAllWithMemberDelivery();
+//        List<SimpleOrderDto> result = orders.stream()
+//                .map(o -> new SimpleOrderDto(o))
+//                .collect(toList());
+//        return result;
+//    }
+    @GetMapping("/api/v3.1/orders")
+    public List<SpringDataJaxb.OrderDto> ordersV3_page(@RequestParam(value = "offset",
+            defaultValue = "0") int offset,
+                                                       @RequestParam(value = "limit", defaultValue
+                                                = "100") int limit) {
+        List<Order> orders = orderRepository.findAllWithMemberDelivery(offset,
+                limit);
+        List<SpringDataJaxb.OrderDto> result = orders.stream()
+                .map(o -> new SpringDataJaxb.OrderDto())
                 .collect(toList());
         return result;
     }
     @GetMapping("/api/v4/simple-orders")
-    public List<OrderSimpleApiController> ordersV4() {
-       return orderRepository.findOrderDtos();
+    public List<OrderSimpleQueryDto> ordersV4() {
+       return orderSimpleQueryRepository.findOrderDtos();
     }
 
 
