@@ -7,14 +7,11 @@ import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.logging.SimpleFormatter;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -63,6 +60,11 @@ public class OrderSimpleApiController {
                 .collect(toList());
         return result;
     }
+    @GetMapping("/api/v4/simple-orders")
+    public List<OrderSimpleApiController> ordersV4() {
+       return orderRepository.findOrderDtos();
+    }
+
 
     @Data
     static class SimpleOrderDto {

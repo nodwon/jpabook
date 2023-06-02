@@ -1,4 +1,5 @@
 package jpabook.jpashop.repository;
+import jpabook.jpashop.api.OrderSimpleApiController;
 import org.springframework.util.StringUtils;
 
 import jakarta.persistence.EntityManager;
@@ -57,5 +58,13 @@ public class OrderRepository {
                         "join fetch o.member m"+
                         "join fetch o.delivery d" + Order.class).getResultList();
 
+    }
+
+    public List<OrderSimpleApiController> findOrderDtos() {
+        return em.createQuery("select  new jpabook.jpashop.repository.SimpleOrderQueryDto(o.id, m.name, o.orderDate, o.status, o.address)" +
+                            "from Order  o"
+                            +"join o.member m"
+                            + "join o.delivery d", OrderSimpleApiController.class)
+                .getResultList();
     }
 }
