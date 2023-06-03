@@ -51,6 +51,17 @@ public class OrderRepository {
     }
 
 
+    public List findAllWithMemberDelivery() { //fetchjoin  전략
+        return em.createQuery(
+                        "select o from Order o " +
+                                "join fetch o.member m " +
+                                "join fetch o.delivery d", Order.class)
+                .setFirstResult(1)
+                .setMaxResults(100)
+                .getResultList();
+
+
+    }
     public List findAllWithMemberDelivery(int offset, int limit) { //fetchjoin  전략
         return em.createQuery(
                         "select o from Order o " +
@@ -64,6 +75,24 @@ public class OrderRepository {
     }
 
 
-
-
+    public List<Order> findAllWithItem() {
+        return em.createQuery("select distinct o from Order o" +
+                " join fetch o.member m " + //order에서 member fetch join
+                " join fetch o.delivery d" + //member에서 delievery  fetch join 여기까지 페치 조인한다,
+                " join fetch o.orderItems oi"+
+                " join fetch oi.item i", Order.class)
+                .setFirstResult(1)
+                .setMaxResults(100)
+                .getResultList();
+        /*
+        order와 orderitems를 조인하면 1랑2로 조인하면 중복으로 데이터가 2개씩 생긴다.
+        jpa에서 데이터를 가져올때 2배가 되어버린다, 의도와 다른 조인이 만들어진다.->
+        distinct 로 중복을 제거한다, 그런데 문제는 전부가 같아야 중복이 제거할수 있기때문에
+        db쿼리를 뽑을때는 안될수 있다.
+        jpa에서 자체적으로 order가 같은 아이디 값을 중복을제거할수 있다.
+        1. db에 distinct를 날린다,
+        2. root에 컬렉션에 중복이되면 걸러서 담는다.
+        이러면 쿼리를 한번나간다.
+        * */
+    }
 }
