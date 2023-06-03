@@ -90,6 +90,10 @@ public class OrderApiController {
     public List<OrderQueryDto> ordersv4(){
        return ordQueryRepository.findOrderQueryDtos();
     }
+    @GetMapping("/api/v5/orders") //페이징하면서 페치조인함
+    public List<OrderQueryDto> ordersV5(){
+        return ordQueryRepository.findAllByDto_optimization();
+    }
     @Data
     static class OrderDto {
 
