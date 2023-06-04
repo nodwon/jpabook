@@ -10,6 +10,8 @@ import jpabook.jpashop.repository.order.query.OrderFlatDto;
 import jpabook.jpashop.repository.order.query.OrderItemQueryDto;
 import jpabook.jpashop.repository.order.query.OrderQueryDto;
 import jpabook.jpashop.repository.order.query.OrderQueryRepository;
+import jpabook.jpashop.service.query.OrderDto;
+import jpabook.jpashop.service.query.OrderQueryService;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -70,13 +72,16 @@ public class OrderApiController {
                 .map(o -> new OrderDto(o))
                 .collect(toList());
     }
+    private final OrderQueryService orderQueryService;
+
     @GetMapping("/api/v3/orders") // collection fetch 조인으로하겠다
     public List<OrderDto> ordersV3() {
-        List<Order> orders = orderRepository.findAllWithItem();
-        List<OrderDto> result = orders.stream()
-                .map(o -> new OrderDto(o))
-                .collect(toList());
-        return result;
+        return  orderQueryService.ordersV3();
+//        List<Order> orders = orderRepository.findAllWithItem();
+//        List<OrderDto> result = orders.stream()
+//                .map(o -> new OrderDto(o))
+//                .collect(toList());
+//        return result;
     }
     @GetMapping("/api/v3.1/orders") //페이징하면서 페치조인함
     public List<OrderDto> ordersV3_page(@RequestParam(value = "offset", defaultValue = "0") int offset,
@@ -96,42 +101,6 @@ public class OrderApiController {
         return orderQueryRepository.findAllByDto_optimization();
     }
 
-    @Data
-    static class OrderDto {
-
-        private Long orderId;
-        private String name;
-        private LocalDateTime orderDate;
-        private OrderStatus orderStatus;
-        private Address address;
-        private List<OrderItemDto> orderItems; //이것같은경우 조심해야한다.
-
-
-        public OrderDto(Order order) {
-            orderId = order.getId();
-            name = order.getMember().getUsername();
-            orderDate = order.getOrderDate();
-            orderStatus = order.getStatus();
-            address = order.getDelivery().getAddress();
-//            order.getOrderItems().stream().forEach(o -> o.getItem().getName());
-//            orderItems = order.getOrderItems();
-            orderItems = order.getOrderItems().stream()
-                    .map(OrderItemDto::new)
-                    .collect(toList());
-        }
-    }
-    @Getter // 이런씩으로 아예 완전히 dto로 바꾸어야하낟
-    static class OrderItemDto{
-        //이렇게 하면 외부에서는 orderdto에서 orderitemdto를 랩핑해서 나가기때문에 문제가 해결됨
-        private  String itemName; // 상품명
-        private int orderPrice; // 주문 가격
-        private int count; // 주문 수량
-        public OrderItemDto(OrderItem orderItem) {
-            itemName = orderItem.getItem().getName();
-            orderPrice = orderItem.getOrderPrice();
-            count = orderItem.getCount();
-        }
-    }
 
 
 }
